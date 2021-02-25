@@ -7,13 +7,17 @@ import java.util.Arrays;
 //Methods pop, top and getMin operations will always be called on non-empty stacks.
 public class B0002_155_min_stack {
     int DEFAULT_SIZE = 10;
+    //    element stack
     int[] stack;
     int index;
     int size;
-    int min;
 
-//     minstack
+    //     minstack
+    int[] minstack;             //minstack share same index and size with element stack
 
+
+    //3ms 100%
+    //40.4MB 91.48%
     public static void main(String[] args) {
         B0002_155_min_stack obj = new B0002_155_min_stack();
         obj.push(1);
@@ -31,27 +35,29 @@ public class B0002_155_min_stack {
         index = 0;
         size = DEFAULT_SIZE;
         stack = new int[DEFAULT_SIZE];
-        min = Integer.MIN_VALUE;
+        //initial minstack
+        minstack = new int[DEFAULT_SIZE];
     }
 
     public void push(int x) {
         if (index == size) {      //if it is full, scale up
-            stack = Arrays.copyOf(stack, size >> 1);
-            size = size >> 1;
+            size = size << 1;
+            stack = Arrays.copyOf(stack, size);
+            minstack = Arrays.copyOf(minstack, size);
         }
-        stack[index++] = x;
-        if (x > min) {
-            min = x;
+        stack[index] = x;
+        if (index == 0) {               //push the newest minimum into stack
+            minstack[index] = x;
+        } else {
+            minstack[index] = Math.min(x, minstack[index - 1]);
         }
+        index++;
     }
 
+    //just remove
     public void pop() {
         if (index != 0) {
             index--;
-        }
-
-        if (index == 0) {
-            min = Integer.MIN_VALUE;
         }
     }
 
@@ -63,9 +69,11 @@ public class B0002_155_min_stack {
         }
     }
 
+    //the minimum changes as the upcoming element
+    //so we need a stack to keep the last minimum
     public int getMin() {
         if (index != 0) {
-            return min;
+            return minstack[index - 1];
         } else {
             throw new RuntimeException("no element in stack!");
         }
@@ -75,5 +83,5 @@ public class B0002_155_min_stack {
 }
 
 //there two types of stack:
-//one is made up with array
-//another is made up with linked list
+//one is made up of array
+//another is made up of linked list
